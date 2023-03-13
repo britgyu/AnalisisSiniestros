@@ -1,0 +1,40 @@
+---
+title: "Análisis Descriptivo"
+output: html_notebook
+---
+
+
+```{r}
+df <- read.csv("./BDD_AGOSTO_2022.csv")
+head(df)
+```
+```{r}
+table(sapply(df, class))
+```
+
+La base de datos cuenta con un total de 56 columnas, de las cuales 29 son identificadas del tipo "character", 25 "integer" y 2 "numeric".
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+datos_les_fal <- data.frame(tipo=c("Lesionados", "Fallecidos"),total=c(sum(df$LESIONADOS),sum(df$FALLECIDOS)))
+
+ggplot(data = datos_les_fal)+
+  geom_bar(aes(x=tipo, y=total),
+               stat="identity",
+               width=0.3,
+               fill="tomato2")
+```
+Hay un total de 104918 lesionados y 11676 fallecidos
+
+```{r}
+data.frame(table(df$PROVINCIA))
+```
+
+```{r}
+ggplot(data = df)+
+  geom_bar(aes(y=PROVINCIA))
+```
+
