@@ -1,13 +1,16 @@
 ---
 title: "Análisis Descriptivo"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 
 ```{r}
-df <- read.csv("./BDD_AGOSTO_2022.csv")
+df <- read.csv("./BDD_DICIEMBRE_2022.csv")
 head(df)
 ```
+
 ```{r}
 table(sapply(df, class))
 ```
@@ -23,18 +26,152 @@ datos_les_fal <- data.frame(tipo=c("Lesionados", "Fallecidos"),total=c(sum(df$LE
 
 ggplot(data = datos_les_fal)+
   geom_bar(aes(x=tipo, y=total),
-               stat="identity",
-               width=0.3,
-               fill="tomato2")
+               stat ="identity",
+               width = 0.3,
+               fill = "tomato2")
 ```
-Hay un total de 104918 lesionados y 11676 fallecidos
+Hay un total de 111512 (104918) lesionados y 12408(11676) fallecidos
 
 ```{r}
-data.frame(table(df$PROVINCIA))
+freq_prov <- data.frame(table(df$PROVINCIA))
+colnames(freq_prov) <- c("Provincias", "Total")
+
+freq_prov$Provincias <- factor(freq_prov$Provincias, levels=freq_prov$Provincias[order(freq_prov$Total)])
+
+ggplot(data = freq_prov, aes(x=Total,y=Provincias))+
+  geom_bar(
+           stat = "identity",
+           fill = "skyblue")
+```
+Se puede observar que las provincias que más registran siniestros son Guayas y Pichincha. Por el otro lado; Napo, Sucumbios, Pastaza y Galápagos entre otras tienen pocos accidentes.
+
+```{r}
+freq_ente_cont <- data.frame(table(df$ENTE_DE_CONTROL))
+colnames(freq_ente_cont) <- c("Ente", "Total")
+
+freq_ente_cont$Ente <- factor(freq_ente_cont$Ente, levels = freq_ente_cont$Ente[order(freq_ente_cont$Total)])
+
+ggplot(data = freq_ente_cont, aes(y=Ente, x=Total))+
+  geom_bar(stat = "identity",
+           fill = "khaki2")
+```
+Del gráfico se observa que los entes que registran un mayor número de siniestro son CTE, DMQ, ATM y PNE
+
+```{r}
+freq_zona <- data.frame(table(df$ZONA_PLANIFICACION))
+colnames(freq_zona) <- c("Zona", "Total")
+
+freq_zona$Zona <- factor(freq_zona$Zona, levels = freq_zona$Zona[order(freq_zona$Zona)])
+
+ggplot(data = freq_zona, aes(y=Total, x=Zona))+
+  geom_bar(stat = "identity",
+           fill = "olivedrab2")
+```
+Zona 8, Zona 9 y Zona 5 con mayor número de siniestros
+
+```{r}
+ggplot(data = df, aes(x=ZONA))+
+  geom_bar(
+           fill = "chartreuse2",
+           width = 0.3)
+```
+Predominan los siniestros en las zonas urbanas del país
+
+```{r}
+freq_mes <- data.frame(table(df$MES_1))
+colnames(freq_mes) <- c("Mes", "Total")
+
+freq_mes$Mes <- factor(freq_mes$Mes, levels = c("ENERO", "FEBRERO", "MARZO",
+                                                "ABRIL", "MAYO", "JUNIO", "JULIO",
+                                                "AGOSTO","SEPTIEMBRE","OCTUBRE",
+                                                "NOVIEMBRE","DICIEMBRE"))
+
+ggplot(data = freq_mes, aes(y=Mes, x=Total))+
+  geom_bar(
+    stat = "identity",
+    fill = "tan2"
+  )
 ```
 
 ```{r}
-ggplot(data = df)+
-  geom_bar(aes(y=PROVINCIA))
+ggplot(data = df, aes(x=FERIADO))+
+  geom_bar(
+    width = 0.3,
+    fill = "tomato2"
+  )
+```
+
+```{r}
+freq_causa <- data.frame(table(df$CODIGO_CAUSA))
+colnames(freq_causa) <- c("Causa", "Total")
+
+freq_causa$Causa <- factor(freq_causa$Causa, levels = freq_causa$Causa[order(freq_causa$Total)])
+
+ggplot(data = freq_causa, aes(y=Causa,x=Total))+
+  geom_bar(
+    stat = "identity",
+    fill = "skyblue")
+```
+Los códigos de causa
+
+```{r}
+freq_tipo <- data.frame(table(df$TIPO_DE_SINIESTRO))
+colnames(freq_tipo) <- c("Tipo", "Total")
+
+freq_tipo$Tipo <- factor(freq_tipo$Tipo, levels = freq_tipo$Tipo[order(freq_tipo$Total)])
+
+ggplot(data = freq_tipo, aes(y=Tipo,x=Total))+
+  geom_bar(
+    stat = "identity",
+    fill = "palegreen3")
+```
+El choque lateral es el tipo de siniestro más común
+
+```{r}
+freq_servicio <- data.frame(table(df$SERVICIO_1))
+colnames(freq_servicio) <- c("Servicio", "Total")
+
+freq_servicio$Servicio <- factor(freq_servicio$Servicio, levels = freq_servicio$Servicio[order(freq_servicio$Total)])
+
+ggplot(data = freq_servicio, aes(y=Servicio,x=Total))+
+  geom_bar(
+    stat = "identity",
+    fill = "lightcoral")
+```
+La gran mayoría ocurre en servicios particulares
+
+```{r}
+ggplot(data = df, aes(x=EDAD_1))+
+  geom_histogram()
+```
+
+```{r}
+ggplot(data = df, aes(x=SEXO_1))+
+  geom_bar(
+    width = 0.3,
+    fill = "mediumorchid2"
+  )
+```
+```{r}
+ggplot(data = df, aes(x=PARTICIPANTE_1))+
+  geom_bar(
+    width = 0.3,
+    fill = "mediumorchid3"
+  )
+```
+```{r}
+ggplot(data = df, aes(x=CASCO_1))+
+  geom_bar(
+    width = 0.3,
+    fill = "mediumorchid2"
+  )
+```
+
+```{r}
+ggplot(data = df, aes(x=CINTURON_1))+
+  geom_bar(
+    width = 0.3,
+    fill = "mediumorchid2"
+  )
 ```
 
