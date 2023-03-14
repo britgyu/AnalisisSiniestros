@@ -5,6 +5,7 @@ output:
   html_notebook: default
 ---
 
+En el presenten análisis se describirán algunas variables de la base de datos de siniestros en el Ecuador de los años correspondientes entre Enero 2017 y Diciembre 2022.
 
 ```{r}
 df <- read.csv("./BDD_DICIEMBRE_2022.csv")
@@ -17,20 +18,26 @@ table(sapply(df, class))
 
 La base de datos cuenta con un total de 56 columnas, de las cuales 29 son identificadas del tipo "character", 25 "integer" y 2 "numeric".
 
-```{r}
+```{r, message=FALSE}
+# para gráficos
 library(ggplot2)
 ```
 
+## Fallecidos y Lesionados
+
 ```{r}
-datos_les_fal <- data.frame(tipo=c("Lesionados", "Fallecidos"),total=c(sum(df$LESIONADOS),sum(df$FALLECIDOS)))
+datos_les_fal <- data.frame(Tipo=c("Lesionados", "Fallecidos"),
+                            Total=c(sum(df$LESIONADOS),sum(df$FALLECIDOS)))
 
 ggplot(data = datos_les_fal)+
-  geom_bar(aes(x=tipo, y=total),
+  geom_bar(aes(x=Tipo, y=Total),
                stat ="identity",
                width = 0.3,
                fill = "tomato2")
 ```
-Hay un total de 111512 (104918) lesionados y 12408(11676) fallecidos
+Entreo los años de 2017 y 2022 se resgistraron un total de 111512 lesionados y 12408 fallecidos en los siniestros del Ecuador.
+
+## Ubicación geográfica
 
 ```{r}
 freq_prov <- data.frame(table(df$PROVINCIA))
@@ -43,7 +50,41 @@ ggplot(data = freq_prov, aes(x=Total,y=Provincias))+
            stat = "identity",
            fill = "skyblue")
 ```
-Se puede observar que las provincias que más registran siniestros son Guayas y Pichincha. Por el otro lado; Napo, Sucumbios, Pastaza y Galápagos entre otras tienen pocos accidentes.
+Se puede observar que las provincias que más registran siniestros son Guayas y Pichincha. Por el otro lado, Galápagos casi no resgistra accidentes.
+
+
+```{r}
+freq_zona <- data.frame(table(df$ZONA_PLANIFICACION))
+colnames(freq_zona) <- c("Zona", "Total")
+
+freq_zona$Zona <- factor(freq_zona$Zona, levels = freq_zona$Zona[order(freq_zona$Zona)])
+
+ggplot(data = freq_zona, aes(y=Total, x=Zona))+
+  geom_bar(stat = "identity",
+           fill = "olivedrab2")
+```
+
+Zona 8, Zona 9 y Zona 5 con mayor número de siniestros. Las zonas de planificación son entes de organización administrativa conformados por provincias conjuntas o distritos metropolitanos que tienen el fin de desconcentrar las actividades administrativas del Estado ecuatoriano. 
+
+```{r, echo=FALSE}
+zonas <- data.frame(
+  "zonas" = c("ZONA 1", "ZONA 2", "ZONA 3",
+              "ZONA 4", "ZONA 5", "ZONA 6",
+              "ZONA 7", "ZONA 8", "ZONA 9"),
+  "idk" = c("Esmeraldas, Imbabura, Carchi, Sucumbíos",
+            "Pichincha, Napo, Orellana",
+            "Cotopaxi, Tungurahua, Chimborazo, Pastaza",
+            "Manabí, Santo Domingo de los Tsáchilas",
+            "Santa Elena, Guayasm Bolívar, Los Ríos, Galápagos",
+            "Cañar, Azuay, Morona Santiago",
+            "El Oro, Loja, Zamora Chinchipe",
+            "Guayaquil, Samborondón, Durán",
+            "Distrito Metropolitano de Quito")
+)
+zonas
+```
+
+## Entes de tránsito
 
 ```{r}
 freq_ente_cont <- data.frame(table(df$ENTE_DE_CONTROL))
@@ -57,25 +98,7 @@ ggplot(data = freq_ente_cont, aes(y=Ente, x=Total))+
 ```
 Del gráfico se observa que los entes que registran un mayor número de siniestro son CTE, DMQ, ATM y PNE
 
-```{r}
-freq_zona <- data.frame(table(df$ZONA_PLANIFICACION))
-colnames(freq_zona) <- c("Zona", "Total")
-
-freq_zona$Zona <- factor(freq_zona$Zona, levels = freq_zona$Zona[order(freq_zona$Zona)])
-
-ggplot(data = freq_zona, aes(y=Total, x=Zona))+
-  geom_bar(stat = "identity",
-           fill = "olivedrab2")
-```
-Zona 8, Zona 9 y Zona 5 con mayor número de siniestros
-
-```{r}
-ggplot(data = df, aes(x=ZONA))+
-  geom_bar(
-           fill = "chartreuse2",
-           width = 0.3)
-```
-Predominan los siniestros en las zonas urbanas del país
+## Análisis descriptivo - variables de tiempo
 
 ```{r}
 freq_mes <- data.frame(table(df$MES_1))
@@ -93,6 +116,8 @@ ggplot(data = freq_mes, aes(y=Mes, x=Total))+
   )
 ```
 
+Se observa que no hay una gran diferencia de la cantidad de siniestros entre los meses. Diciembre es el mes que registra más accidentes.
+
 ```{r}
 ggplot(data = df, aes(x=FERIADO))+
   geom_bar(
@@ -100,6 +125,8 @@ ggplot(data = df, aes(x=FERIADO))+
     fill = "tomato2"
   )
 ```
+
+## Posibles causas, tipos de siniestros
 
 ```{r}
 freq_causa <- data.frame(table(df$CODIGO_CAUSA))
@@ -114,6 +141,12 @@ ggplot(data = freq_causa, aes(y=Causa,x=Total))+
 ```
 Los códigos de causa
 
+**C14** : Conducir desatento a las condiciones de tránsito (Celular, pantallas de video, comida, maquillaje o cualquier otro elemento distractor).
+
+**C09** : Conducir vehículo superando los límites máximos de velocidad.
+
+**C23** : No respetar las señales reglamentarias de tránsito (pare, ceda el paso, luz roja del semáforo, etc)
+
 ```{r}
 freq_tipo <- data.frame(table(df$TIPO_DE_SINIESTRO))
 colnames(freq_tipo) <- c("Tipo", "Total")
@@ -125,7 +158,9 @@ ggplot(data = freq_tipo, aes(y=Tipo,x=Total))+
     stat = "identity",
     fill = "palegreen3")
 ```
-El choque lateral es el tipo de siniestro más común
+El choque lateral es el tipo de siniestro más común. Seguido de atropellos y estrellamientos.
+
+## Características del vehículo o vehículos involucrados
 
 ```{r}
 freq_servicio <- data.frame(table(df$SERVICIO_1))
@@ -140,10 +175,19 @@ ggplot(data = freq_servicio, aes(y=Servicio,x=Total))+
 ```
 La gran mayoría ocurre en servicios particulares
 
+## Características de las personas involucradas 
+
 ```{r}
-ggplot(data = df, aes(x=EDAD_1))+
-  geom_histogram()
+edad <- subset(df, EDAD_1 >=0 & EDAD_1<=150)
+
+ggplot(data = edad, aes(x=EDAD_1))+
+  geom_histogram(
+    binwidth = 4,
+    fill = "skyblue"
+  )
 ```
+
+Las personas se encuentran entre 20-40 años
 
 ```{r}
 ggplot(data = df, aes(x=SEXO_1))+
@@ -152,6 +196,9 @@ ggplot(data = df, aes(x=SEXO_1))+
     fill = "mediumorchid2"
   )
 ```
+
+Los hombres se involucran mayormente en los siniestros.
+
 ```{r}
 ggplot(data = df, aes(x=PARTICIPANTE_1))+
   geom_bar(
