@@ -1,5 +1,5 @@
 # AnalisisSiniestros
 
 #### Análisis descriptivo
- [En R] (http://htmlpreview.github.com/?https://github.com/britgyu/AnalisisSiniestros/blob/main/siniestros/AnalisisDescriptivo.nb.html)
+ [En R] (http://htmlpreview.github.io/?https://github.com/britgyu/AnalisisSiniestros/blob/main/siniestros/AnalisisDescriptivo.nb.html)
  
