@@ -1,0 +1,129 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r, message=FALSE}
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(readr)
+library(lubridate)
+library(stringr)
+```
+
+
+## Análisis temporal
+
+```{r}
+df <- read.csv("./BDD_DICIEMBRE_2022.csv")
+df$FECHA <- dmy(df$FECHA)
+```
+```{r}
+fechas <- data.frame(table(df$FECHA))
+colnames(fechas) <- c("Fecha","Freq")
+fechas$Fecha <- ymd(fechas$Fecha)
+
+```
+```{r}
+library(highcharter)
+```
+
+
+```{r}
+highchart(type = "stock") %>%
+  hc_add_series(
+    data = fechas, 
+    type = "line",
+    hcaes(x=Fecha,
+          y=Freq,
+          group=year(Fecha)))
+```
+
+```{r}
+df %>%
+hchart( 
+       type = column,)
+```
+```{r}
+sin_mes_fer <- data.frame(table(df$MES_1, df$FERIADO))
+colnames(sin_mes_fer) <- c("Mes", "Feriado", "Freq")
+
+hchart(sin_mes_fer, 
+       type = "column",
+       hcaes(x=Mes,y=Freq,group=Feriado),
+       stacking = "normal")
+```
+
+```{r}
+
+df$MES_1 <- factor(df$MES_1, levels= c("ENERO", "FEBRERO", "MARZO",
+                                                "ABRIL", "MAYO", "JUNIO", "JULIO",
+                                                "AGOSTO","SEPTIEMBRE","OCTUBRE",
+                                                "NOVIEMBRE","DICIEMBRE"))
+  
+mes <- ggplot(data = df, aes(x=MES_1, fill=FERIADO))+
+  geom_bar(
+    position = "stack",
+    width = 0.7
+  )+
+  theme(
+    axis.text.x = element_text(angle = 45)
+  )
+```
+
+```{r}
+font = list(
+  family = "DM S",
+  size = 15,
+  color = "white"
+)
+
+label = list(
+  bgcolor = "#232F34",
+  bordercolor = "transparent",
+  font = font
+)
+
+ggplotly(mes, tooltip=c("y")) %>%
+  style(hoverlabel = label) %>%
+  layout(font = font)
+```
+
+```{r}
+unique(df$ANIO)
+```
+
+
+```{r}
+gmes <- ggplot(data = df, aes(x=ANIO, fill=FERIADO))+
+  geom_bar(
+    position = "stack",
+    width = 0.7
+  )
+```
+```{r}
+ggplotly(gmes, tooltip = c("y"))
+```
+
+```{r}
+head(gauto)
+```
+
+```{r}
+gauto <- data.frame(table(df$TIPO_DE_VEHICULO_1, df$ANIO))
+colnames(gauto) <- c("Auto", "Año", "Freq")
+
+#df %>% 
+  
+ggauto <- ggplot(data = gauto, aes(x=Año, y=Freq, group=Auto, colour=Auto))+
+  geom_line()
+
+ggplotly(ggauto)
+```
+
+```{r}
+
+```
+
